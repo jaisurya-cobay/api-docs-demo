@@ -1,11 +1,11 @@
 name: API docs
 
-# Every push to main or a release tag (v*) rebuilds the docs site:
-# latest (main) + one spec per release tag, shown in a version dropdown.
+# Every push to main rebuilds the docs site:
+# latest (main) + one spec per release tag (v*), shown in a version dropdown.
+# (Tags are only read, not deployed from: Pages only accepts deploys from main.)
 on:
   push:
     branches: [main]
-    tags: ["v*"]
   workflow_dispatch:
 
 permissions:
