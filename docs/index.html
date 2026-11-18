@@ -6,8 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
-    <!-- Scalar reads openapi.json (published next to this file by CI) and renders the UI -->
-    <script id="api-reference" data-url="./openapi.json"></script>
+    <div id="app"></div>
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+    <script>
+      // versions.json is written by CI (scripts/build-site.sh): one entry per release + latest.
+      // Passing them as "sources" makes Scalar show a version dropdown.
+      fetch("./versions.json")
+        .then((r) => r.json())
+        .then((sources) => {
+          Scalar.createApiReference("#app", {
+            sources: sources.map((s, i) => ({ ...s, default: i === 0 })),
+          });
+        });
+    </script>
   </body>
 </html>

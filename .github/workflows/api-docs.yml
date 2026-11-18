@@ -1,9 +1,11 @@
 name: API docs
 
-# Every push to main regenerates openapi.json from the code and redeploys the docs site.
+# Every push to main or a release tag (v*) rebuilds the docs site:
+# latest (main) + one spec per release tag, shown in a version dropdown.
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   workflow_dispatch:
 
 permissions:
@@ -23,6 +25,8 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # need all tags to rebuild old versions
 
       - uses: actions/setup-node@v4
         with:
@@ -31,14 +35,14 @@ jobs:
 
       - run: npm ci
 
-      # 1. Scan the code → openapi.json (version = short commit SHA)
-      - name: Generate openapi.json
-        run: API_VERSION="1.0.0+${GITHUB_SHA::7}" npm run docs:generate
+      # 1. Scan the code of main + every release tag → one openapi.json per version
+      - name: Build versioned docs site
+        run: bash scripts/build-site.sh
 
-      # 2. Publish docs/ (index.html with Scalar + openapi.json) to GitHub Pages
+      # 2. Publish site/ (Scalar page + versions/*.json) to GitHub Pages
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          path: site
       - id: deploy
         uses: actions/deploy-pages@v4

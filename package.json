@@ -5,7 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "docs:generate": "node scripts/export-openapi.js"
+    "docs:generate": "node scripts/export-openapi.js",
+    "docs:site": "bash scripts/build-site.sh"
   },
   "license": "ISC",
   "type": "commonjs",

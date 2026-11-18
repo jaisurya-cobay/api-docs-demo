@@ -48,7 +48,7 @@ function buildApp() {
     r.get("/tasks", {
       schema: {
         operationId: "listTasks",
-        tags: ["Tasks"],
+        tags: ["Tasks v1"],
         summary: "List tasks",
         querystring: {
           type: "object",
@@ -61,7 +61,7 @@ function buildApp() {
     r.post("/tasks", {
       schema: {
         operationId: "createTask",
-        tags: ["Tasks"],
+        tags: ["Tasks v1"],
         summary: "Create a task",
         body: {
           type: "object",
@@ -79,7 +79,7 @@ function buildApp() {
     r.get("/tasks/:id", {
       schema: {
         operationId: "getTask",
-        tags: ["Tasks"],
+        tags: ["Tasks v1"],
         summary: "Get one task",
         params: { type: "object", properties: { id: { type: "integer" } } },
         response: { 200: { $ref: "Task#" }, 404: { $ref: "Error#" } },
@@ -92,7 +92,7 @@ function buildApp() {
     r.patch("/tasks/:id", {
       schema: {
         operationId: "completeTask",
-        tags: ["Tasks"],
+        tags: ["Tasks v1"],
         summary: "Mark a task done",
         params: { type: "object", properties: { id: { type: "integer" } } },
         response: { 200: { $ref: "Task#" }, 404: { $ref: "Error#" } },
@@ -103,7 +103,7 @@ function buildApp() {
       task.done = true;
       return task;
     });
-  }, { prefix: "/api" });
+  }, { prefix: "/api/v1" });
 
   return app;
 }
