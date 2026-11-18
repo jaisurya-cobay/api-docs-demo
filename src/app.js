@@ -44,74 +44,7 @@ function buildApp() {
 
   const tasks = [{ id: 1, title: "Write API docs", done: false }];
 
-  app.register(async (r) => {
-    r.get("/tasks", {
-      schema: {
-        operationId: "listTasks",
-        tags: ["Tasks v1"],
-        deprecated: true,
-        description: "**Deprecated:** use the v2 endpoint. v1 will be removed in v2.0.0.",
-        summary: "List tasks",
-        querystring: {
-          type: "object",
-          properties: { done: { type: "boolean", description: "Filter by status" } },
-        },
-        response: { 200: { type: "array", items: { $ref: "Task#" } } },
-      },
-    }, async (req) => (req.query.done === undefined ? tasks : tasks.filter((t) => t.done === req.query.done)));
-
-    r.post("/tasks", {
-      schema: {
-        operationId: "createTask",
-        tags: ["Tasks v1"],
-        deprecated: true,
-        description: "**Deprecated:** use the v2 endpoint. v1 will be removed in v2.0.0.",
-        summary: "Create a task",
-        body: {
-          type: "object",
-          required: ["title"],
-          properties: { title: { type: "string", minLength: 1, maxLength: 200 } },
-        },
-        response: { 201: { $ref: "Task#" } },
-      },
-    }, async (req, reply) => {
-      const task = { id: tasks.length + 1, title: req.body.title, done: false };
-      tasks.push(task);
-      return reply.code(201).send(task);
-    });
-
-    r.get("/tasks/:id", {
-      schema: {
-        operationId: "getTask",
-        tags: ["Tasks v1"],
-        deprecated: true,
-        description: "**Deprecated:** use the v2 endpoint. v1 will be removed in v2.0.0.",
-        summary: "Get one task",
-        params: { type: "object", properties: { id: { type: "integer" } } },
-        response: { 200: { $ref: "Task#" }, 404: { $ref: "Error#" } },
-      },
-    }, async (req, reply) => {
-      const task = tasks.find((t) => t.id === req.params.id);
-      return task ?? reply.code(404).send({ message: "Task not found" });
-    });
-
-    r.patch("/tasks/:id", {
-      schema: {
-        operationId: "completeTask",
-        tags: ["Tasks v1"],
-        deprecated: true,
-        description: "**Deprecated:** use the v2 endpoint. v1 will be removed in v2.0.0.",
-        summary: "Mark a task done",
-        params: { type: "object", properties: { id: { type: "integer" } } },
-        response: { 200: { $ref: "Task#" }, 404: { $ref: "Error#" } },
-      },
-    }, async (req, reply) => {
-      const task = tasks.find((t) => t.id === req.params.id);
-      if (!task) return reply.code(404).send({ message: "Task not found" });
-      task.done = true;
-      return task;
-    });
-  }, { prefix: "/api/v1" });
+  // v1 removed in v2.0.0 (deprecated since v1.1.0)
 
   // v2: tasks now have a priority
   const TaskV2 = {
