@@ -10,6 +10,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SITE="$ROOT/site"
 rm -rf "$SITE" "$ROOT/.versions"
+git -C "$ROOT" worktree prune   # clear stale records from an interrupted run
 mkdir -p "$SITE/versions"
 cp "$ROOT/docs/index.html" "$SITE/"
 entries=""
