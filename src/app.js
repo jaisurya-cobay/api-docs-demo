@@ -93,6 +93,21 @@ function buildApp() {
       tasks.push(task);
       return reply.code(201).send(task);
     });
+
+    r.patch("/tasks/:id/done", {
+      schema: {
+        operationId: "completeTaskV2",
+        tags: ["Tasks v2"],
+        summary: "Mark a task done",
+        params: { type: "object", properties: { id: { type: "integer" } } },
+        response: { 200: TaskV2, 404: { $ref: "Error#" } },
+      },
+    }, async (req, reply) => {
+      const task = tasks.find((t) => t.id === req.params.id);
+      if (!task) return reply.code(404).send({ message: "Task not found" });
+      task.done = true;
+      return { priority: "medium", ...task };
+    });
   }, { prefix: "/api/v2" });
 
   return app;
