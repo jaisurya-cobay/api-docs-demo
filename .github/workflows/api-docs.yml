@@ -1,11 +1,10 @@
 name: API docs
 
-# Every push to main rebuilds the docs site:
-# latest (main) + one spec per release tag (v*), shown in a version dropdown.
-# (Tags are only read, not deployed from: Pages only accepts deploys from main.)
+# A push to any environment branch (qa / staging / main=prod) rebuilds the docs site.
+# The site always contains all envs + every release tag (v*), shown in a dropdown.
 on:
   push:
-    branches: [main]
+    branches: [main, staging, qa]
   workflow_dispatch:
 
 permissions:
