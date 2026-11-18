@@ -49,6 +49,8 @@ function buildApp() {
       schema: {
         operationId: "listTasks",
         tags: ["Tasks v1"],
+        deprecated: true,
+        description: "**Deprecated:** use the v2 endpoint. v1 will be removed in v2.0.0.",
         summary: "List tasks",
         querystring: {
           type: "object",
@@ -62,6 +64,8 @@ function buildApp() {
       schema: {
         operationId: "createTask",
         tags: ["Tasks v1"],
+        deprecated: true,
+        description: "**Deprecated:** use the v2 endpoint. v1 will be removed in v2.0.0.",
         summary: "Create a task",
         body: {
           type: "object",
@@ -80,6 +84,8 @@ function buildApp() {
       schema: {
         operationId: "getTask",
         tags: ["Tasks v1"],
+        deprecated: true,
+        description: "**Deprecated:** use the v2 endpoint. v1 will be removed in v2.0.0.",
         summary: "Get one task",
         params: { type: "object", properties: { id: { type: "integer" } } },
         response: { 200: { $ref: "Task#" }, 404: { $ref: "Error#" } },
@@ -93,6 +99,8 @@ function buildApp() {
       schema: {
         operationId: "completeTask",
         tags: ["Tasks v1"],
+        deprecated: true,
+        description: "**Deprecated:** use the v2 endpoint. v1 will be removed in v2.0.0.",
         summary: "Mark a task done",
         params: { type: "object", properties: { id: { type: "integer" } } },
         response: { 200: { $ref: "Task#" }, 404: { $ref: "Error#" } },
@@ -104,6 +112,55 @@ function buildApp() {
       return task;
     });
   }, { prefix: "/api/v1" });
+
+  // v2: tasks now have a priority
+  const TaskV2 = {
+    type: "object",
+    required: ["id", "title", "done", "priority"],
+    properties: {
+      ...Task.properties,
+      priority: { type: "string", enum: ["low", "medium", "high"], example: "high" },
+    },
+  };
+
+  app.register(async (r) => {
+    r.get("/tasks", {
+      schema: {
+        operationId: "listTasksV2",
+        tags: ["Tasks v2"],
+        summary: "List tasks",
+        querystring: {
+          type: "object",
+          properties: { priority: { type: "string", enum: ["low", "medium", "high"], description: "Filter by priority" } },
+        },
+        response: { 200: { type: "array", items: TaskV2 } },
+      },
+    }, async (req) => {
+      const all = tasks.map((t) => ({ priority: "medium", ...t }));
+      return req.query.priority ? all.filter((t) => t.priority === req.query.priority) : all;
+    });
+
+    r.post("/tasks", {
+      schema: {
+        operationId: "createTaskV2",
+        tags: ["Tasks v2"],
+        summary: "Create a task",
+        body: {
+          type: "object",
+          required: ["title"],
+          properties: {
+            title: { type: "string", minLength: 1, maxLength: 200 },
+            priority: { type: "string", enum: ["low", "medium", "high"], default: "medium" },
+          },
+        },
+        response: { 201: TaskV2 },
+      },
+    }, async (req, reply) => {
+      const task = { id: tasks.length + 1, title: req.body.title, done: false, priority: req.body.priority };
+      tasks.push(task);
+      return reply.code(201).send(task);
+    });
+  }, { prefix: "/api/v2" });
 
   return app;
 }
