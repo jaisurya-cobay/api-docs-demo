@@ -108,6 +108,21 @@ function buildApp() {
       task.done = true;
       return { priority: "medium", ...task };
     });
+
+    r.delete("/tasks/:id", {
+      schema: {
+        operationId: "deleteTaskV2",
+        tags: ["Tasks v2"],
+        summary: "Delete a task",
+        params: { type: "object", properties: { id: { type: "integer" } } },
+        response: { 204: { type: "null", description: "Deleted" }, 404: { $ref: "Error#" } },
+      },
+    }, async (req, reply) => {
+      const i = tasks.findIndex((t) => t.id === req.params.id);
+      if (i === -1) return reply.code(404).send({ message: "Task not found" });
+      tasks.splice(i, 1);
+      return reply.code(204).send();
+    });
   }, { prefix: "/api/v2" });
 
   return app;
